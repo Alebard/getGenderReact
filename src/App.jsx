@@ -1,54 +1,61 @@
 import './App.css'
 import ReactDOM from 'react-dom'
-
+import React from "react";
 
 const serverUrl = 'https://api.genderize.io';
 
+class App extends React.Component {
 
-function Input() {
-    return <input id="name" type="text" placeholder='введите дату'/>
+    constructor(props) {
+        super(props);
+        this.state = {name: "", gender: ""}
+
+        this.setName = this.setName.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.Answer = this.Answer.bind(this);
+    }
+
+    async handleSubmit(e) {
+        e.preventDefault();
+        console.log(this.state.name)
+        const urlCheckGender = `${serverUrl}?name=${this.state.name}`
+        const gender = (await fetch(urlCheckGender).then(response => response.json())).gender
+        console.log(gender)
+        this.setState({gender: gender});
+    }
+
+
+    setName(e) {
+        this.setState({name: e.target.value});
+    }
+
+
+    Answer() {
+        console.log(this.state.gender)
+        if (this.state.gender === null ) {
+            return (
+                <div>Неизвестное имя</div>
+            )
+        }else{
+            return (
+                this.state.gender
+            )
+        }
+    }
+
+    render() {
+        return (
+            <div className="app">
+                <form onSubmit={this.handleSubmit}>
+                    <input id="name" type="text" placeholder='введите имя' onChange={this.setName}/>
+                    {this.state.name && this.state.name.length < 3 && <div>"Некорректное имя"</div>}
+                    <button>Проверить имя</button>
+                </form>
+                <this.Answer/>
+            </div>
+        )
+    }
 }
 
-function Button() {
-    return <button>Проверить имя</button>
-}
-function Output(props) {
-    return <div>{props.gender}</div>
-}
-
-function ErrorMessage() {
-    return <p>Неверное имя</p>
-}
-
-
-function App(props) {
-    return (
-        <div className="app">
-            <form onSubmit={handleSubmit}>
-                <Input/>
-                {props.name && props.name.length < 3 && <ErrorMessage />}
-                <Button/>
-            </form>
-            {props.gender && <Output gender = {props.gender}/> }
-        </div>
-    )
-}
-
-
-async function handleSubmit(e) {
-    e.preventDefault();
-    const name = document.querySelector("input").value
-    const gender = (await getGender(name)).gender;
-    const element = (
-            <App  gender = {gender}  name = {name} />
-    )
-    ReactDOM.render(element, document.getElementById('root'));
-}
-
-async function getGender(name) {
-    const urlCheckGender = `${serverUrl}?name=${name}`
-    const response = await fetch(urlCheckGender)
-    return await response.json()
-}
 
 export default App
