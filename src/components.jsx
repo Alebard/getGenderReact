@@ -1,7 +1,6 @@
 import React from "react";
 
 export function Answer(props) {
-    console.log(props.gender)
     if (props.gender === null ) {
         return (
             <div>Неизвестное имя</div>
